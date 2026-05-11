@@ -23,24 +23,24 @@ class AlienContact(BaseModel):
     is_verified: Annotated[bool, Field(default=False)]
 
     @model_validator(mode="after")
-    def check(self):
+    def check(self) -> "AlienContact":
         if not self.contact_id.startswith("AC"):
-            raise ValueError("contact_id must start with 'AC'")
+            raise ValueError("contact_id must start with 'AC'\n")
         if self.contact_type == ContactType.PHYSICAL and not self.is_verified:
-            raise ValueError("Physical contacts must be verified")
+            raise ValueError("Physical contacts must be verified\n")
         if self.contact_type == ContactType.TELEPATHIC and \
            self.witness_count < 3:
             raise ValueError("Telepathic contacts must have at " +
-                             "least 3 witnesses")
+                             "least 3 witnesses\n")
         if self.signal_strength > 7.0 and self.message_received is None:
-            raise ValueError("Strong signals must have a message received")
+            raise ValueError("Strong signals must have a message received\n")
         return self
 
 
 def main() -> None:
     print("Alien Contact Log Validation")
     print("========================================\n")
-    contact = AlienContact(
+    contact = AlienContact(  # type: ignore
         contact_id="AC_2024_001",
         timestamp=datetime(2024, 6, 1, 14, 30),
         location="Area 51, Nevada",
@@ -64,7 +64,7 @@ def main() -> None:
     print("========================================\n")
     print("Expected validation error:")
     try:
-        contact2 = AlienContact(
+        contact2 = AlienContact(  # type: ignore
             contact_id="AC_2024_001",
             timestamp=datetime(2024, 6, 1, 14, 30),
             location="Area 51, Nevada",

@@ -41,7 +41,7 @@ def main() -> None:
     print("========================================\n")
     print("Expected validation error:")
     try:
-        station2 = SpaceStation(
+        station2 = SpaceStation(  # type: ignore
             station_id="ISS001",
             name="International Space Station",
             crew_size=26,
