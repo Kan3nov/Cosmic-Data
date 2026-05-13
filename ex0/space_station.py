@@ -10,8 +10,8 @@ class SpaceStation(BaseModel):
     power_level: Annotated[float, Field(ge=0, le=100)]
     oxygen_level: Annotated[float, Field(ge=0, le=100)]
     last_maintenance: datetime
-    is_operational: Annotated[bool, Field(default=True)]
-    notes: Optional[Annotated[str, Field(max_length=200)]] = None
+    is_operational: bool = Field(default=True)
+    notes: Optional[str] = Field(default=None, max_length=200)
 
 
 def main() -> None:
@@ -25,12 +25,11 @@ def main() -> None:
         oxygen_level=92.3,
         last_maintenance=datetime.now(),
         is_operational=True,
-        notes=None
     )
 
     print("Valid station created:")
     print(f"ID: {station.station_id}\nName: {station.name}\n" +
-          f"Crew Size: {station.crew_size}people\n" +
+          f"Crew Size: {station.crew_size} people\n" +
           f"Power Level: {station.power_level}%\n" +
           f"Oxygen Level: {station.oxygen_level}%\n" +
           f"Last Maintenance: {station.last_maintenance.
@@ -41,7 +40,7 @@ def main() -> None:
     print("========================================\n")
     print("Expected validation error:")
     try:
-        station2 = SpaceStation(  # type: ignore
+        station2 = SpaceStation(
             station_id="ISS001",
             name="International Space Station",
             crew_size=26,
@@ -51,7 +50,7 @@ def main() -> None:
         )
         print(station2)
     except ValidationError as e:
-        print(e)
+        print(e.errors()[0]['msg'])
 
 
 if __name__ == "__main__":

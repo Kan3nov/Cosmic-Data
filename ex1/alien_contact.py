@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, model_validator, ValidationError
 from typing import Annotated, Optional
 from datetime import datetime
 from enum import Enum
@@ -19,8 +19,8 @@ class AlienContact(BaseModel):
     signal_strength: Annotated[float, Field(ge=0, le=10)]
     duration_minutes: Annotated[int, Field(ge=1, le=1440)]
     witness_count: Annotated[int, Field(ge=1, le=100)]
-    message_received: Optional[Annotated[str, Field(max_length=500)]] = None
-    is_verified: Annotated[bool, Field(default=False)]
+    message_received: Optional[str] = Field(max_length=500, default=None)
+    is_verified: bool = Field(default=False)
 
     @model_validator(mode="after")
     def check(self) -> "AlienContact":
@@ -40,7 +40,7 @@ class AlienContact(BaseModel):
 def main() -> None:
     print("Alien Contact Log Validation")
     print("========================================\n")
-    contact = AlienContact(  # type: ignore
+    contact = AlienContact(
         contact_id="AC_2024_001",
         timestamp=datetime(2024, 6, 1, 14, 30),
         location="Area 51, Nevada",
@@ -64,7 +64,7 @@ def main() -> None:
     print("========================================\n")
     print("Expected validation error:")
     try:
-        contact2 = AlienContact(  # type: ignore
+        contact2 = AlienContact(
             contact_id="AC_2024_001",
             timestamp=datetime(2024, 6, 1, 14, 30),
             location="Area 51, Nevada",
@@ -75,8 +75,8 @@ def main() -> None:
             message_received="Greetings from Zeta Reticuli",
         )
         print(contact2)
-    except Exception as e:
-        print(e)
+    except ValidationError as e:
+        print(e.errors()[0]['msg'])
 
 
 if __name__ == "__main__":

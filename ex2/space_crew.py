@@ -1,5 +1,5 @@
 from enum import Enum
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, model_validator, ValidationError
 from typing import Annotated
 from datetime import datetime
 
@@ -19,7 +19,7 @@ class CrewMember(BaseModel):
     age: Annotated[int, Field(ge=18, le=80)]
     specialization: Annotated[str, Field(min_length=3, max_length=30)]
     years_experience: Annotated[int, Field(ge=0, le=50)]
-    is_active: Annotated[bool, Field(default=True)]
+    is_active: bool = Field(default=True)
 
 
 class SpaceMission(BaseModel):
@@ -29,6 +29,7 @@ class SpaceMission(BaseModel):
     launch_date: datetime
     duration_days: Annotated[int, Field(ge=1, le=3650)]
     crew: Annotated[list[CrewMember], Field(min_length=1, max_length=12)]
+    mission_status: str = Field(default="planned")
     budget_millions: Annotated[float, Field(ge=1.0, le=10000.0)]
 
     @model_validator(mode="after")
@@ -159,8 +160,8 @@ def main() -> None:
             budget_millions=500.0
         )
         show_mission(mission2)
-    except Exception as e:
-        print(e)
+    except ValidationError as e:
+        print(e.errors()[0]['msg'])
 
 
 if __name__ == "__main__":
